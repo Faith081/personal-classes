@@ -35,7 +35,7 @@ const userInfo = ((userId) => {
 //in an assync function the try and catch function most be there to check and verify the work
 async function getuserDetails() {
   try {
-    const user = await userInfo(5)
+    const user = await userInfo(2)
     console.log(user)
   } catch (error) {
     console.log(error)
