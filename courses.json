@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1771277507578",
+    "title": "Backend Development",
+    "code": "CSC401",
+    "capacity": 3,
+    "students": [
+      {
+        "name": "John Doe",
+        "email": "john@gmail.com"
+      }
+    ]
+  }
+]

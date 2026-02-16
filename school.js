@@ -1,9 +1,27 @@
 const express = require("express")
 const app = express()
+const path = require("path")
+const fs = require("fs")
+
+const data_file = path.join(__dirname, "courses.json")
+
+
+
+
+
+
+
+let courses = [];
+
+if (fs.existsSync(data_file)) {
+  const data = fs.readFileSync(data_file);
+  courses = JSON.parse(data);
+}
+
+
+
 
 app.use(express.json())
-
-const courses = [];
 
 app.post("/courses", (req, res) => {
   const { title, code, capacity } = req.body // this code collects the users info and stores the in the container
@@ -37,10 +55,11 @@ app.post("/courses", (req, res) => {
     title,
     code,
     capacity,
-    student: []
+    students: []
   }
 
   courses.push(newCourse)
+  fs.writeFileSync(data_file, JSON.stringify(courses, null, 2))
 
   res.status(201).json({
     message: "courses created successfully",
@@ -49,6 +68,40 @@ app.post("/courses", (req, res) => {
 
 
 })
+
+app.post("/courses/:courseId/enroll", (req, res) => {
+
+  const { courseId } = req.params;
+  const { name, email, } = req.body
+
+  const eCourse = courses.find(course => course.id === courseId)
+
+  if (!eCourse) {
+    return res.status(404).json({ message: "course not found" })
+  }
+
+  const existingEmail = eCourse.students.find(c => c.email === email)
+
+  if (existingEmail) {
+    return res.status(400).json({ message: "student with email already enrolled" })
+  }
+
+  if (eCourse.students.length >= eCourse.capacity) {
+    return res.status(400).json({ message: "course capacity exceeded" })
+  }
+
+
+  const newStudent = { name, email }
+
+  eCourse.students.push(newStudent)
+  fs.writeFileSync(data_file, JSON.stringify(courses, null, 2))
+
+  res.status(201).json({
+    message: "student enrolled successfully",
+    data: newStudent
+  });
+
+});
 
 
 
