@@ -2,6 +2,7 @@ const express = require("express")
 const app = express()
 const path = require("path")
 const fs = require("fs")
+const { count } = require("console")
 
 const data_file = path.join(__dirname, "courses.json")
 
@@ -104,6 +105,60 @@ app.post("/courses/:courseId/enroll", (req, res) => {
 });
 
 
+app.get("/courses", (req, res) => {
+
+  let filteredCourses = [...courses]
+  const { minCapaciy, title } = req.query
+
+  if (minCapaciy) {
+    return filteredCourses = filteredCourses.filter(f => f.capacity >= Number(minCapaciy))
+  }
+
+  if (title) {
+    return filteredCourses = filteredCourses.filter(t => t.title.toLowerCase().includes(title.toLocaleLowerCase()))
+  }
+
+  res.status(200).json(filteredCourses);
+
+})
+
+
+app.get("/courses/:courseId/students", (req, res) => {
+  const { courseId } = req.params
+  const { name } = req.query
+
+  const course = courses.find(c => c.id === courseId)
+
+  if (!course) {
+    return res.status(404).json({
+      success: true,
+      message: "course not found"
+    })
+  }
+
+  if (course.students.length >= course.capacity) {
+    return res.status(400).json({
+      count: course.students.lenght,
+      success: false,
+      message: "course is full"
+    })
+  }
+
+
+  let fileteredStudent = [...course.students]
+
+  if (name) {
+    fileteredStudent = fileteredStudent.filter(s => s.name.toLowerCase().includes(name.toLowerCase()))
+  }
+
+
+  res.status(200).json({
+    success: true,
+    count: fileteredStudent.length,
+    data: fileteredStudent
+  })
+
+})
 
 
 
